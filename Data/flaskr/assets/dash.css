@@ -1,0 +1,27 @@
+#Data-History{
+    margin-top: 20px;
+    margin-left: 30px;
+    width: 95%;
+    
+} 
+.cell-table{
+    font-family: 'Courier New', Courier, monospace !important;
+}
+.dash-cell{
+    padding-right: 10px !important;
+}
+.dash-header{
+    font-weight: bold !important;
+}
+.column-0{
+    font-weight: bold;
+   
+    padding-left: 0px !important;
+}
+.column-1{
+    font-weight: bold;
+}
+
+.header-name{
+    font-weight: bold;
+}

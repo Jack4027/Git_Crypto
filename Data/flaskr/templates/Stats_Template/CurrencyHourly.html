@@ -1,0 +1,446 @@
+{% extends 'base.html' %}
+{% block header %}
+<nav class='navbar navbar-light' style='background-color: #e3f2fd;'>
+
+    <h1 style='font-family: monospace;'>{% block title %}{{Crypto}} Graphing {% endblock %}</h1>
+    <ul>
+        <li class='nav-item'>
+            <a class='btn btn-outline-secondary mr-3' href={{graphing}}g>Daily</a>
+        </li>
+        <li class='nav-item'>
+            <a class='btn btn-outline-secondary ml-3' href={{graphing}}h>Hourly</a>
+        </li>
+        <li class='nav-item'>
+            <a class='btn btn-outline-secondary ml-4 mr-1' href={{graphing}}p>Predictive</a>
+        </li>
+    </ul>
+</nav>
+
+{% endblock %}
+
+{% block content %}
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link active" id="latest-tab" data-toggle="tab" href="#latest" role="tab" aria-controls="latest"
+            aria-selected="true">Latest</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="all-tab" data-toggle="tab" href="#all" role="tab" aria-controls="all"
+            aria-selected="false">All</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="opening-tab" data-toggle="tab" href="#opening" role="tab" aria-controls="opening"
+            aria-selected="false">Opening</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="closing-tab" data-toggle="tab" href="#closing" role="tab" aria-controls="closing"
+            aria-selected="false">Closing</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="highest-tab" data-toggle="tab" href="#highest" role="tab" aria-controls="highest"
+            aria-selected="false">Highest</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="lowest-tab" data-toggle="tab" href="#lowest" role="tab" aria-controls="lowest"
+            aria-selected="false">Lowest</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="volume-tab" data-toggle="tab" href="#volume" role="tab" aria-controls="volume"
+            aria-selected="false">Volume</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="1day-tab" data-toggle="tab" href="#dayone" role="tab" aria-controls="1day"
+            aria-selected="false">24 Hour Stats</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="7day-tab" data-toggle="tab" href="#dayseven" role="tab" aria-controls="7day"
+            aria-selected="false">7 Day Stats</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="14day-tab" data-toggle="tab" href="#dayfourteen" role="tab" aria-controls="14day"
+            aria-selected="false">14 Day Stats</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="30day-tab" data-toggle="tab" href="#daythirty" role="tab" aria-controls="30day"
+            aria-selected="false">30 Day Stats</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="90day-tab" data-toggle="tab" href="#dayninety" role="tab" aria-controls="90day"
+            aria-selected="false">90 Day Stats</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="180day-tab" data-toggle="tab" href="#dayoneeighty" role="tab" aria-controls="180day"
+            aria-selected="false">180 Day Stats</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="annual-tab" data-toggle="tab" href="#annual" role="tab" aria-controls="annual"
+            aria-selected="false">Annual Stats</a>
+    </li>
+</ul>
+
+<div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="latest" role="tabpanel" aria-labelledby="latest-tab">
+
+        <div class='row table-responsive'>
+
+            <table class='table table-striped table-hover statistics_table ml-3' style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th scope='col' class='table-primary'>{{Crypto}}</th>
+                        <th scope='col' class='table-danger'>Date</th>
+                        <th scope='col' class='table-success'>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    {%for key, value in latest.items()%}
+                    <tr>
+                        <th scope='row'>{{ key }}</th>
+                        <td>{{ value[1] }}</td>
+                        <td>{{ '${:,.2f}'.format(value[0]) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="all" role="tabpanel" aria-labelledby="all-tab">
+        <div class='row table-responsive'>
+
+            <table class='table table-striped table-hover statistics_table ml-3' style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th scope='col' class='table-primary'>{{Crypto}}</th>
+                        <th scope='col' class='table-danger'>Date</th>
+                        <th scope='col' class='table-success'>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {%for key, value in stats.items()%}
+                    <tr>
+                        <th scope='row'>{{ key }}</th>
+                        <td>{{ value[1] }}</td>
+                        <td>{{ '${:,.2f}'.format(value[0]) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="opening" role="tabpanel" aria-labelledby="opening-tab">
+        <div class='row table-responsive'>
+
+            <table class='table table-striped table-hover statistics_table ml-3' style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th scope='col' class='table-primary'>{{Crypto}}</th>
+                        <th scope='col' class='table-danger'>Date</th>
+                        <th scope='col' class='table-success'>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {%for key, value in opening.items()%}
+                    <tr>
+                        <th scope='row'>{{ key }}</th>
+                        <td>{{ value[1] }}</td>
+                        <td>{{ '${:,.2f}'.format(value[0]) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="closing" role="tabpanel" aria-labelledby="closing-tab">
+        <div class='row table-responsive'>
+
+            <table class='table table-striped table-hover statistics_table ml-3' style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th scope='col' class='table-primary'>{{Crypto}}</th>
+                        <th scope='col' class='table-danger'>Date</th>
+                        <th scope='col' class='table-success'>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {%for key, value in closing.items()%}
+                    <tr>
+                        <th scope='row'>{{ key }}</th>
+                        <td>{{ value[1] }}</td>
+                        <td>{{ '${:,.2f}'.format(value[0]) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="highest" role="tabpanel" aria-labelledby="highest-tab">
+        <div class='row table-responsive'>
+
+            <table class='table table-striped table-hover statistics_table ml-3' style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th scope='col' class='table-primary'>{{Crypto}}</th>
+                        <th scope='col' class='table-danger'>Date</th>
+                        <th scope='col' class='table-success'>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {%for key, value in highs.items()%}
+                    <tr>
+                        <th scope='row'>{{ key }}</th>
+                        <td>{{ value[1] }}</td>
+                        <td>{{ '${:,.2f}'.format(value[0]) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="lowest" role="tabpanel" aria-labelledby="lowest-tab">
+        <div class='row table-responsive'>
+
+            <table class='table table-striped table-hover statistics_table ml-3' style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th scope='col' class='table-primary'>{{Crypto}}</th>
+                        <th scope='col' class='table-danger'>Date</th>
+                        <th scope='col' class='table-success'>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {%for key, value in lows.items()%}
+                    <tr>
+                        <th scope='row'>{{ key }}</th>
+                        <td>{{ value[1] }}</td>
+                        <td>{{ '${:,.2f}'.format(value[0]) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="volume" role="tabpanel" aria-labelledby="volume-tab">
+        <div class='row table-responsive'>
+
+            <table class='table table-striped table-hover statistics_table ml-3' style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th scope='col' class='table-primary'>{{Crypto}}</th>
+                        <th scope='col' class='table-danger'>Date</th>
+                        <th scope='col' class='table-success'>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {%for key, value in volume.items()%}
+                    <tr>
+                        <th scope='row'>{{ key }}</th>
+                        <td>{{ value[1] }}</td>
+                        <td>{{ '${:,.2f}'.format(value[0]) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="dayone" role="tabpanel" aria-labelledby="1day-tab">
+
+        <div class='row table-responsive'>
+
+            <table class='table table-striped table-hover statistics_table ml-3' style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th scope='col' class='table-primary'>{{Crypto}}</th>
+                        <th scope='col' class='table-danger'>Date</th>
+                        <th scope='col' class='table-success'>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {%for key, value in one.items()%}
+                    <tr>
+                        <th scope='row'>{{ key }}</th>
+                        <td>{{ value[1] }}</td>
+                        <td>{{ '${:,.2f}'.format(value[0]) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="dayseven" role="tabpanel" aria-labelledby="7day-tab">
+
+        <div class='row table-responsive'>
+
+            <table class='table table-striped table-hover statistics_table ml-3' style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th scope='col' class='table-primary'>{{Crypto}}</th>
+                        <th scope='col' class='table-danger'>Date</th>
+                        <th scope='col' class='table-success'>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {%for key, value in seven.items()%}
+                    <tr>
+                        <th scope='row'>{{ key }}</th>
+                        <td>{{ value[1] }}</td>
+                        <td>{{ '${:,.2f}'.format(value[0]) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="dayfourteen" role="tabpanel" aria-labelledby="14day-tab">
+
+        <div class='row table-responsive'>
+
+            <table class='table table-striped table-hover statistics_table ml-3' style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th scope='col' class='table-primary'>{{Crypto}}</th>
+                        <th scope='col' class='table-danger'>Date</th>
+                        <th scope='col' class='table-success'>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {%for key, value in fourteen.items()%}
+                    <tr>
+                        <th scope='row'>{{ key }}</th>
+                        <td>{{ value[1] }}</td>
+                        <td>{{ '${:,.2f}'.format(value[0]) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="daythirty" role="tabpanel" aria-labelledby="30day-tab">
+
+        <div class='row table-responsive'>
+
+            <table class='table table-striped table-hover statistics_table ml-3' style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th scope='col' class='table-primary'>{{Crypto}}</th>
+                        <th scope='col' class='table-danger'>Date</th>
+                        <th scope='col' class='table-success'>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {%for key, value in thirty.items()%}
+                    <tr>
+                        <th scope='row'>{{ key }}</th>
+                        <td>{{ value[1] }}</td>
+                        <td>{{ '${:,.2f}'.format(value[0]) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="dayninety" role="tabpanel" aria-labelledby="90day-tab">
+
+        <div class='row table-responsive'>
+
+            <table class='table table-striped table-hover statistics_table ml-3' style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th scope='col' class='table-primary'>{{Crypto}}</th>
+                        <th scope='col' class='table-danger'>Date</th>
+                        <th scope='col' class='table-success'>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {%for key, value in ninety.items()%}
+                    <tr>
+                        <th scope='row'>{{ key }}</th>
+                        <td>{{ value[1] }}</td>
+                        <td>{{ '${:,.2f}'.format(value[0]) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="dayoneeighty" role="tabpanel" aria-labelledby="180day-tab">
+
+        <div class='row table-responsive'>
+
+            <table class='table table-striped table-hover statistics_table ml-3' style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th scope='col' class='table-primary'>{{Crypto}}</th>
+                        <th scope='col' class='table-danger'>Date</th>
+                        <th scope='col' class='table-success'>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {%for key, value in day180.items()%}
+                    <tr>
+                        <th scope='row'>{{ key }}</th>
+                        <td>{{ value[1] }}</td>
+                        <td>{{ '${:,.2f}'.format(value[0]) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="annual" role="tabpanel" aria-labelledby="annual-tab">
+
+        <div class='row table-responsive'>
+
+            <table class='table table-striped table-hover statistics_table ml-3' style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th scope='col' class='table-primary'>{{Crypto}}</th>
+                        <th scope='col' class='table-danger'>Date</th>
+                        <th scope='col' class='table-success'>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {%for key, value in annual.items()%}
+                    <tr>
+                        <th scope='row'>{{ key }}</th>
+                        <td>{{ value[1] }}</td>
+                        <td>{{ '${:,.2f}'.format(value[0]) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class='row'>
+    
+    <nav class='navbar navbar-light' style='background-color: #e3f2fd;'>
+        
+        <h1 style='font-family: monospace;'>{{Crypto}} Statistics Data</h1>
+        <ul>
+            <li class='nav-item'>
+                <a class='btn btn-outline-secondary mr-3' href={{url_for(DailyStats)}}>Daily Data</a>
+            </li>
+            <li class='nav-item'>
+                <a class='btn btn-outline-secondary ml-3' href='#'>Hourly Data</a>
+            </li>
+        </ul>
+    </nav>
+    
+</div>
+</div>
+{% endblock %}
