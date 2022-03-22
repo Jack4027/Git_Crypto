@@ -9,36 +9,48 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import plotly.figure_factory as ff
 
+'''This class generates the Plotly graph off of the Hourly data set'''
 
 url = "https://www.cryptodatadownload.com/cdd/Bittrex_BTCUSD_1h.csv"
 
 def drawGraph(url,colour,crypto):
 
+    #Read data from URL online 
     r = requests.get(url, verify=False)
 
     read = pan.read_csv(io.StringIO(r.text), skiprows=[0],usecols=['Date','Symbol','Open','High','Low','Close','Volume USD'],
                         na_values=['no info', '.'], delimiter=',')
 
+    #Iterating through columns from panda's data table
+    #Except Date and Symbol columns as non numeric values
     for col in read.columns:
         if col != 'Date' or 'Symbol':
             for count, i in enumerate(read[col]):
+                 #If a a column is missing data insert previous column's data
                 if i == 0 and count!=0:
                     read[col][count] = read[col][count-1]
+                #If first column value insert average of next 1000 columns.
                 elif i == 0 and count==0:
                     read[col][count] = np.mean(read[col][count:count+1000])
 
+    #reversing pandas data table
     read = read.iloc[::-1]
 
+    #formatting datetime to more appropriate style
     read['Date'] = [dt.datetime.strftime(dt.datetime.strptime(d, '%Y-%m-%d %I-%p'), '%d-%m-%Y %X') for d in read['Date']]
 
     print(read.head())
+    
+     #Creates a second Y axis for the graph, this is necessary as we are displaying trade volume and price
     fig = make_subplots(specs=[[{'secondary_y':True}]])
     
+    #Adding the graph traces to the graph figure
     fig.add_trace(go.Scatter(x=read['Date'], y=read['Close'], name = 'Closing Price (USD)', line_color=colour),
     secondary_y=True,)
     fig.add_trace(go.Scatter(x=read['Date'], y=read['Volume USD'], name = 'Volume (USD)', line_color='lightgreen', opacity=0.6),
     secondary_y=False,)
 
+    #Updating layout
     fig.update_layout(
         title={'text':f'{crypto} Time Series',
         'y':0.95,
@@ -53,6 +65,7 @@ def drawGraph(url,colour,crypto):
         )
        
     fig.update_xaxes(rangeslider_visible=True,
+    #Gives users option of editing the range seen in the graph
     rangeselector=dict( 
         buttons=list([
             dict(count=1, label="1m", step="month", stepmode="backward"),

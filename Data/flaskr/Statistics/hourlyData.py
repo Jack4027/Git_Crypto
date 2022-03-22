@@ -6,9 +6,11 @@ import io
 import requests
 
 
-    
+'''This method reads data from the url, converts inot a pandas data table and 
+then uses slicing to determing various time based statistics from the data (Hourly Data)'''
 def stats(url):
 
+    '''Reading data from url and specifying columns to use'''
     r = requests.get(url, verify=False)
 
     data = pan.read_csv(io.StringIO(r.text), skiprows=[0],usecols=['Date','Symbol','Open','High','Low','Close','Volume USD'],
@@ -24,9 +26,10 @@ def stats(url):
                     data[col][count] = np.mean(data[col][count: count+1000])
    
 
-
+    #formatting date               
     data['Date'] = [dt.datetime.strftime(dt.datetime.strptime(d, '%Y-%m-%d %I-%p'), '%d-%m-%Y %X') for d in data['Date']]
     
+    #creating statistic vars
     todays = [data['Close'][0], data['Date'][0]]
     Vol1H = [data['Volume USD'][0], data['Date'][0]]
     highestClose1 = [0, None]
@@ -100,6 +103,7 @@ def stats(url):
     highestHigh365 = [0,None]
     highestVol365 = [0,None]
     
+    #determining Daily data, islice goes over first 1 *24 columns
     for row in islice(data.itertuples(), (24*1)):
             
         if row[3]> highestOpen1[0]:
@@ -133,6 +137,7 @@ def stats(url):
             highestVol1[0] = row[7]
             highestVol1[1] = row[1]
 
+    #determining weekly data, islice goes over first 7 *24 columns
     for row in islice(data.itertuples(), (24*7)):
             
         if row[3]> highestOpen7[0]:
@@ -166,6 +171,7 @@ def stats(url):
             highestVol7[0] = row[7]
             highestVol7[1] = row[1]
 
+    #determining fortnightly data, islice goes over first 14*24 columns
     for row in islice(data.itertuples(), (24*14)):
             
         if row[3]> highestOpen14[0]:
@@ -199,6 +205,7 @@ def stats(url):
             highestVol14[0] = row[7]
             highestVol14[1] = row[1]
 
+   #determining monthly data, islice goes over first 30*24 columns
     for row in islice(data.itertuples(), (24*30)):
             
         if row[3]> highestOpen30[0]:
@@ -232,6 +239,7 @@ def stats(url):
             highestVol30[0] = row[7]
             highestVol30[1] = row[1]
 
+   #determining 3 monthly data, islice goes over first 90*24 columns
     for row in islice(data.itertuples(), (24*90)):
         if row[3]> highestOpen90[0]:
             highestOpen90[0] = row[3]
@@ -264,6 +272,7 @@ def stats(url):
             highestVol90[0] = row[7]
             highestVol90[1] = row[1]
 
+   #determining 6 monthly data, islice goes over first 180*24 columns
     for row in islice(data.itertuples(), (24*180)):
         if row[3] > highestOpen180[0]:
             highestOpen180[0] = row[3]
@@ -296,6 +305,7 @@ def stats(url):
             highestVol180[0] = row[7]
             highestVol180[1] = row[1]
 
+   #determining yearly data, islice goes over first 365 columns
     for row in islice(data.itertuples(), (24*365)):
         if row[3] > highestOpen365[0]:
             highestOpen365[0] = row[3]
@@ -328,6 +338,9 @@ def stats(url):
             highestVol365[0] = row[7]
             highestVol365[1] = row[1]
 
+    #Statistics dictionaries
+    
+    #All Stats
     statistics = {'Latest Price':todays,'Latest Hourly Volume':Vol1H,'Highest Hourly Volume 24 Hours': highestVol1,'Lowest Hourly Volume 24 Hours': lowestVol1,
     'Highest Opening Price 24 Hours':highestOpen1,'Lowest Opening Price 24 Hours': lowestOpen1,'Highest Closing Price 24 Hours':highestClose30,'Lowest Closing Price 24 Hours': lowestClose1,
     'Highest Hourly Price 24 Hour':highestHigh1,'Lowest Hourly High 24 Hour': lowestHigh1,'Lowest Hourly Price 24 Hour':lowestLow1,'Highest Hourly Low 24 Hour': highestLow1,
@@ -350,58 +363,71 @@ def stats(url):
     'Highest Hourly Closing Price Annual':highestClose365,'Lowest Hourly Closing Price Annual': lowestClose365,'Highest Hourly Price Annual':highestHigh365,'Lowest Hourly High Annual': lowestHigh365,
     'Lowest Hourly Price Annual':lowestLow365,'Highest Hourly Low Annual': highestLow365}
     
+    #Latest Stats
     latest = {'Latest Hourly Price':todays,'Latest Hourly Volume':Vol1H}
 
+    #Opening Stats
     opening = {'Highest Opening Price 24 Hours':highestOpen1,'Lowest Opening Price 24 Hours': lowestOpen1, 'Highest Opening Price 7 Days':highestOpen7,'Lowest Opening Price 7 Days': lowestOpen7, 
     'Highest Opening Price 14 Days':highestOpen14,'Lowest Opening Price 14 Days': lowestOpen14,'Highest Opening Price 30 Days':highestOpen30,'Lowest Opening Price 30 Days': lowestOpen30, 
     'Highest Opening Price 90 Days':highestOpen90,'Lowest Opening Price 90 Days': lowestOpen90,'Highest Opening Price 180 Days':highestOpen180,'Lowest Opening Price 180 Days': lowestOpen180, 
     'Highest Opening Price Annual':highestOpen365,'Lowest Opening Price Annual': lowestOpen365}
 
+    #Closing Stats
     closing = {'Highest Closing Price 24 Hours':highestClose1,'Lowest Closing Price 24 Hours': lowestClose1, 'Highest Closing Price 7 Days':highestClose7,
     'Lowest Closing Price 7 Days': lowestClose7,'Highest Closing Price 14 Days':highestClose14,'Lowest Closing Price 14 Days': lowestClose14, 
     'Highest Closing Price 30 Days':highestClose30,'Lowest Closing Price 30 Days': lowestClose30, 'Highest Closing Price 90 Days':highestClose90,
     'Lowest Closing Price 90 Days': lowestClose90, 'Highest Closing Price 180 Days':highestClose180,'Lowest Closing Price 180 Days': lowestClose180, 
     'Highest Closing Price Annual':highestClose365,'Lowest Closing Price Annual': lowestClose365}
 
+    #High Stats
     highs = {'Highest Hourly Price 24 Hour':highestHigh1,'Lowest Hourly High 24 Hour': lowestHigh1,'Highest Hourly Price 7 Days':highestHigh7,'Lowest Hourly High 7 Days': lowestHigh7,
     'Highest Hourly Price 14 Days':highestHigh14,'Lowest Hourly High 14 Days': lowestHigh14,'Highest Hourly Price 30 Days':highestHigh30,'Lowest Hourly High 30 Days': lowestHigh30, 
     'Highest Hourly Price 90 Days':highestHigh90,'Lowest Hourly High 90 Days': lowestHigh90,'Highest Hourly Price 180 Days':highestHigh180,'Lowest Hourly High 180 Days': lowestHigh180,
     'Highest Hourly Price Annual':highestHigh365,'Lowest Hourly High Annual': lowestHigh365}
 
+    #Low Stats
     lows = {'Lowest Hourly Price 24 Hour':lowestLow1,'Highest Hourly Low 24 Hour': highestLow1,'Lowest Hourly Price 7 Days':lowestLow7,'Highest Hourly Low 7 Days': highestLow7,
     'Lowest Hourly Price 14 Days':lowestLow14,'Highest Hourly Low 14 Days': highestLow14,'Lowest Hourly Price 30 Days':lowestLow30,'Highest Hourly Low 30 Days': highestLow30,
     'Lowest Hourly Price 90 Days':lowestLow90, 'Highest Hourly Low 90 Days': highestLow90,'Lowest Hourly Price 180 Days':lowestLow180,'Highest Hourly Low 180 Days': highestLow180,
     'Lowest Hourly Price Annual':lowestLow365,'Highest Hourly Low Annual': highestLow365}
 
+    #Volume Stats
     volume = {'Latest Hourly Volume':Vol1H,'Highest Hourly Volume 24 Hours':highestVol1, 'Lowest Hourly Volume 24 Hours': lowestVol1,'Highest Hourly Volume 7 Days':highestVol7, 
     'Lowest Hourly Volume 7 Days': lowestVol7,'Highest Hourly Volume 14 Days':highestVol14, 'Lowest Hourly Volume 14 Days': lowestVol14,'Highest Hourly Volume 30 Days':highestVol30,
      'Lowest Hourly Volume 30 Days': lowestVol30,'Highest Hourly Volume 90 Days':highestVol90,'Lowest Hourly Volume 90 Days': lowestVol90,'Highest Hourly Volume 180 Days':highestVol180,
      'Lowest Hourly Volume 180 Days': lowestVol180,'Highest Hourly Volume Annual':highestVol365,'Lowest Hourly Volume Annual': lowestVol365}
-
+    
+    #1 Day Stats
     one = {'Highest Hourly Volume 24 Hours': highestVol1,'Lowest Hourly Volume 24 Hours': lowestVol1, 'Highest Hourly Opening Price 24 Hours':highestOpen1,
     'Lowest Hourly Opening Price 24 Hours': lowestOpen1,'Highest Hourly Closing Price 24 Hours':highestClose1,'Lowest Hourly Closing Price 24 Hours': lowestClose1, 
     'Highest Hourly Daily Price 24 Hours':highestHigh1,'Lowest Hourly High 24 Hours': lowestHigh1,'Lowest Hourly Price 24 Hours':lowestLow1,'Highest Hourly Low 24 Hours': highestLow1}
 
+    #7 Day Stats
     seven = {'Highest Hourly Volume 7 Days': highestVol7,'Lowest Hourly Volume 7 Days': lowestVol7,'Highest Hourly Opening Price 7 Days':highestOpen7,
     'Lowest Hourly Opening Price 7 Days': lowestOpen7,'Highest Hourly Closing Price 7 Days':highestClose7,'Lowest Hourly Closing Price 7 Days': lowestClose7,
     'Highest Hourly Price 7 Days':highestHigh7,'Lowest Hourly High 7 Days': lowestHigh7, 'Lowest Hourly Price 7 Days':lowestLow7,'Highest Hourly Low 7 Days': highestLow7}
 
+    #14 Day Stats
     fourteen = {'Highest Hourly Volume 14 Days': highestVol14,'Lowest Hourly Volume 14 Days': lowestVol14,'Highest Hourly Opening Price 14 Days':highestOpen14,
     'Lowest Hourly Opening Price 14 Days': lowestOpen14,'Highest Hourly Closing Price 14 Days':highestClose14,'Lowest Hourly Closing Price 14 Days': lowestClose14,
      'Highest Hourly Price 14 Days':highestHigh14,'Lowest Hourly High 14 Days': lowestHigh14, 'Lowest Hourly Price 14 Days':lowestLow14,'Highest Hourly Low 14 Days': highestLow14}
 
+    #Month Stats
     thirty = {'Highest Hourly Volume 30 Days': highestVol30,'Lowest Hourly Volume 30 Days': lowestVol30, 'Highest Hourly Opening Price 30 Days':highestOpen30,
     'Lowest Hourly Opening Price 30 Days': lowestOpen30,'Highest Hourly Closing Price 30 Days':highestClose30,'Lowest Hourly Closing Price 30 Days': lowestClose30, 
     'Highest Hourly Daily Price 30 Days':highestHigh30,'Lowest Hourly High 30 Days': lowestHigh30,'Lowest Hourly Price 30 Days':lowestLow30,'Highest Hourly Low 30 Days': highestLow30}
 
+    #3 Month Stats
     ninety = {'Highest Hourly Volume 90 Days': highestVol90,'Lowest Hourly Volume 90 Days': lowestVol90,'Highest Hourly Opening Price 90 Days':highestOpen90,
     'Lowest Hourly Opening Price 90 Days': lowestOpen90,'Highest Hourly Closing Price 90 Days':highestClose90,'Lowest Hourly Closing Price 90 Days': lowestClose90, 
     'Highest Hourly Price 90 Days':highestHigh90,'Lowest Hourly High 90 Days': lowestHigh90, 'Lowest Hourly Price 90 Days':lowestLow90,'Highest Hourly Low 90 Days': highestLow90}
 
+    #6 Month Stats
     oneeighty = {'Highest Hourly Volume 180 Days': highestVol180,'Lowest Hourly Volume 180 Days': lowestVol180,'Highest Hourly Opening Price 180 Days':highestOpen180,
     'Lowest Hourly Opening Price 180 Days': lowestOpen180,'Highest Hourly Closing Price 180 Days':highestClose180,'Lowest Hourly Closing Price 180 Days': lowestClose180,
     'Highest Hourly Price 180 Days':highestHigh180,'Lowest Hourly High 180 Days': lowestHigh180,'Lowest Daily Price 180 Days':lowestLow180,'Highest Hourly Low 180 Days': highestLow180}
 
+    #Year Stats
     annual = {'Highest Hourly Volume Annual': highestVol365,'Lowest Hourly Volume Annual': lowestVol365,'Highest Hourly Opening Price Annual':highestOpen365,'Lowest Hourly Opening Price Annual': lowestOpen365,
     'Highest Hourly Closing Price Annual':highestClose365,'Lowest Hourly Closing Price Annual': lowestClose365,'Highest Hourly Price Annual':highestHigh365,'Lowest Hourly High Annual': lowestHigh365,
     'Lowest Hourly Price Annual':lowestLow365,'Highest Hourly Low Annual': highestLow365}

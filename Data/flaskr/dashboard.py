@@ -22,9 +22,10 @@ children= dcc.Graph(
 )
 )
 """
-
+#Loading the datasets
 bitcoin = daily(Bitcoindaily,'gold','Bitcoin')
 bh = hourly(Bitcoinhourly,'gold','Bitcoin')
+#Predicted values table and graph
 bp,bitcoinPredictionTable = prediction(Bitcoindaily,'gold','Bitcoin')
 
 ethereum = daily(Ethereumdaily,'purple','Ethereum')
@@ -43,13 +44,16 @@ XRP = daily(XRPdaily,'black','XRP')
 xrph = hourly(XRPhourly, 'black', 'XRP')
 xrpp,XRPPredictionTable = prediction(XRPdaily,'black','XRP')
 
+#This method converts the url link to a pandas dataframe
 def datatodataframe(url):
     r = requests.get(url, verify=False)
 
 
     data = pd.read_csv(io.StringIO(r.text), skiprows=[0],usecols=['Date','Symbol','Open','High','Low','Close','Volume USD'],
                         na_values=['no info', '.'], delimiter=',')
-      
+    
+    
+    #Controlling for null values
     for col in data.columns:
         if col != 'Date' or 'Symbol':
             for count, i in enumerate(data[col]):
@@ -58,6 +62,7 @@ def datatodataframe(url):
                 elif i == 0 and count ==0:
                     data[col][count] = np.mean(data[col][count: count+100])
     
+    #differentiates format for hourly and daily date
     if '_1h' in url:
         data['Date'] = [dt.datetime.strftime(dt.datetime.strptime(d, '%Y-%m-%d %I-%p'),'%d-%m-%Y %X') for d in data['Date']]
     else:
@@ -67,12 +72,14 @@ def datatodataframe(url):
     
     columns = ['Open', 'Close', 'Low', 'High', 'Volume USD']
 
-       
+    '''Uses a lamdba function to apply USD 
+    ending to all the specified columns'''
     for i in columns:
         data[i] = data.apply(lambda x: "{} USD".format(x[i]),axis = 1)
         
     return data
 
+'''Formatting prediction table with USD ending'''
 def predictiontodataframe(read):
 
     """
@@ -106,6 +113,10 @@ def predictiontotable(read):
 
     return table
 """
+
+
+'''Changes data file to a Dash table so that it can be displayed
+on the HTML more aesthetically'''
 def create_table(file):
     table = dash_table.DataTable(
         id = 'Data-History',
@@ -127,18 +138,25 @@ def create_table(file):
 
     return table
 
+#Creating the Dash App off of Flask instance
 def create(server):
 
+    #Dash app instance
     app = dash.Dash(
         __name__,
+        #User flask instance as referenced server
         server = server,
+        #prefix
         routes_pathname_prefix='/dashanalytics/',
         external_stylesheets=[
             'templates/Bitcoin/bit.css', dbc.themes.BOOTSTRAP]
     )
 
+    #Setting up the app layout
     app.layout = html.Div([
+        #Setting location ID via dash core components module
         dcc.Location(id='url'),
+        #Setting Navigation for different Cryptos via dash core components module
         dbc.Nav( 
         [   
             dbc.NavItem(dbc.NavLink('Bitcoin Statistics',style = {'color':'limegreen'}, href='http://127.0.0.1:5000/'), style={'background-color':'lightgreen','border-radius':'3em', 'margin-left': '3em'}),
@@ -147,22 +165,27 @@ def create(server):
             dbc.NavItem(dbc.NavLink('Litecoin Statistics',style = {'color':'limegreen'}, href='http://127.0.0.1:5000/Litecoin'), style={'background-color':'lightgreen','border-radius':'3em', 'margin-left': '3em'}),
             dbc.NavItem(dbc.NavLink('XRP Statistics',style = {'color':'limegreen'}, href='http://127.0.0.1:5000/XRP'), style={'background-color':'lightgreen','border-radius':'3em', 'margin-left': '3em'}),
      ],
+        #pill buttons
         pills=True,
         style = {'padding-top':'20px', 'padding-left':'20px','padding-bottom':'20px', 'background-color':'lightblue'},
         
     ),
+    #Actual HTML content to be displayed depending on Crypto
     html.Div(id='page-content'),
     ] 
     )
     
 
-    
+    #Bitcoin Daily Data tables and graphs
     bit_daily=html.Div([
 
+        #Displaying the imported bitcoin graph via dash core components module
         dcc.Graph(
             id='Bitcoin Daily Time Series',
             figure=bitcoin
         ),
+        
+        #Navigation links
                 dbc.Nav( 
         [   
         dbc.NavItem(dbc.NavLink('Daily',style = {'color':'limegreen'}, href='/dashanalytics/Bitcoin_g'), style={'background-color':'lightgreen','border-radius':'3em', 'margin-left': '3em'}),
@@ -181,8 +204,10 @@ def create(server):
 
 
     ],
+        
         pills=True,
         style = {'padding-top':'20px', 'padding-left':'20px','padding-bottom':'20px', 'background-color':'lightblue'}),
+        #Craeting the Dash table
         create_table(datatodataframe(Bitcoindaily)),
         dcc.Link(dbc.Button("Download CSV", color="primary", className="ml-4 mt-3"), href=Bitcoindaily, target='_blank')
     ])
@@ -590,6 +615,8 @@ def create(server):
         
     ])
     
+    '''This app callback checks tht the url has changed and 
+    then updates the page cntent accordingly'''
     @ app.callback(dash.dependencies.Output('page-content', 'children'),
               [dash.dependencies.Input('url', 'pathname')])
     def display_page(pathname):
@@ -627,4 +654,5 @@ def create(server):
     if __name__ == '__main__':
         app.run_server(debug=True)
 
+    #Return the Dash app to the flask __init__ file
     return app.server
